@@ -2,15 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactModal from "react-modal";
 import { GrClose } from "react-icons/gr";
 import BodyModal from "./BodyModal";
-
-const modalStyles = {
-  content: {
-    top: "10%",
-    with: "90%",
-    padding: "0",
-    minHeight: "60%",
-  },
-};
+import { MODAL_STYLES } from "../../constants";
 
 const BaseModal = ({ isVisible, onClose, form, onDataChange }) => {
   const afterOpenModal = () => {};
@@ -26,7 +18,7 @@ const BaseModal = ({ isVisible, onClose, form, onDataChange }) => {
       onAfterOpen={afterOpenModal}
       onRequestClose={onClose}
       ariaHideApp={false}
-      style={modalStyles}
+      style={MODAL_STYLES}
     >
       <div className="flex flex-col mx-4">
         <button

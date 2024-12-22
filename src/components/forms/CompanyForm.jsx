@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
-
-const CompanyForm = ({onCompanyChange}) => {
+const CompanyForm = ({ onCompanyChange, hide }) => {
   const [company, setCompany] = useState({});
 
   useEffect(() => {
@@ -17,8 +16,8 @@ const CompanyForm = ({onCompanyChange}) => {
   };
 
   return (
-    <form>
-      <div className="mt-4 pb-2 px-2">
+    <form className={`${!hide ? "h-0" : "h-auto"} p-2`}>
+      <div className={`${!hide ? "hidden" : "block"} pb-2 px-2`}>
         <div className="sm:flex space-y-1 sm:space-x-2 sm:space-y-0 mt-1">
           <input
             className="border w-full rounded-lg border-slate-200 hover:border-slate-500 p-2"

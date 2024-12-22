@@ -114,7 +114,7 @@ const InvoiceView = ({ company, client, items, onClear, onClearList }) => {
           </button>
         </div>
 
-        <div className="min-w-[70%] h-full">
+        <div className="w-full h-full">
           <div
             ref={boxRef}
             className="w-full h-full border p-4 rounded bg-white z-40"

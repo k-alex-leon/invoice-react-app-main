@@ -2,7 +2,7 @@ export const getTotal = (items) => {
   let total = 0;
 
   items.forEach((item) => {
-    total = total + item.quantity * item.price;
+    total += item.quantity * item.price + item.boxQuantity * item.boxPrice;
   });
 
   return total;

@@ -1,32 +1,34 @@
-
-export const TableItemsView = ({itemsList}) => {
+export const TableItemsView = ({ itemsList }) => {
   return (
     <table className="w-full mt-4 border-t">
-            <thead>
-              <tr>
-                <td className="mx-[5px] font-bold">Cant.</td>
-                <td className="w-2/4 font-bold">Producto</td>
-                <td className="mx-[5px] font-bold">Unidad</td>
-                <td className="text-end font-bold flex flex-col justify-end">
-                  Total
+      <thead className="font-bold">
+        <tr className="grid grid-cols-7 w-full">
+          <td className="col-span-2">Producto</td>
+          <td>Cajas.</td>
+          <td>Precio.</td>
+          <td>Unidad</td>
+          <td>Precio U.</td>
+          <td className="text-end">Total</td>
+        </tr>
+      </thead>
+      <tbody>
+        {itemsList &&
+          itemsList.map((item, index) => {
+            return (
+              <tr key={index} className="grid grid-cols-7 w-full">
+                <td className="col-span-2">{item.name}</td>
+                <td>{item.boxQuantity}</td>
+                <td>{item.boxPrice}</td>
+                <td>{item.quantity}</td>
+                <td>{item.price}</td>
+                <td className="text-end flex flex-col">
+                  {item.quantity * item.price +
+                    item.boxQuantity * item.boxPrice}
                 </td>
               </tr>
-            </thead>
-            <tbody>
-              {itemsList &&
-                itemsList.map((item, index) => {
-                  return (
-                    <tr key={index}>
-                      <td className="mx-[5px]">{item.quantity}</td>
-                      <td className="w-2/4 font-bold">{item.name}</td>
-                      <td className="mx-[5px]">{item.price}</td>
-                      <td className="text-end font-bold flex flex-col justify-end">
-                        {item.quantity * item.price}
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
-  )
-}
+            );
+          })}
+      </tbody>
+    </table>
+  );
+};
