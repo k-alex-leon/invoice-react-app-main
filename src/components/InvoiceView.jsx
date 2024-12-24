@@ -10,32 +10,32 @@ import FabAddData from "./FabAddData";
 import OptionsModal from "./modals/OptionsModal";
 import BaseModal from "./modals/BaseModal";
 import { notify_success } from "../utils/Notifications";
+import useData from "../hooks/useData";
 
-const InvoiceView = ({ company, client, items, onClear, onClearList }) => {
+const InvoiceView = ({ company, client, onClear, onClearList }) => {
   // DATA STUFF
   const [thisCompany, setCompany] = useState({});
   const [thisClient, setClient] = useState({});
   const [itemsList, setItemsList] = useState([]);
+  const { invoiceProducts } = useData();
 
   let date = new Date();
   let hour = `${date.getHours()}:${date.getMinutes()}`;
   let today = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 
   useEffect(() => {
+    setItemsList(invoiceProducts);
+  }, [invoiceProducts]);
+
+  useEffect(() => {
     setCompany(company);
     setClient(client);
-    setItemsList(items);
-  }, [company, client, items]);
+    // setItemsList(items);
+  }, [company, client]);
 
   let boxRef = useRef();
 
   let total = getTotal(itemsList);
-
-  useEffect(() => {
-    if (items) {
-      setItemsList(items);
-    }
-  }, [items]);
 
   // BUTTONS INVOICE ACTIONS
 
@@ -87,7 +87,7 @@ const InvoiceView = ({ company, client, items, onClear, onClearList }) => {
 
   return (
     <>
-      <div className="flex h-full flex-col p-4 items-center overflow-y-hidden justify-center">
+      <div className="flex h-full flex-col p-4 items-center justify-center">
         <div className="flex justify-end mb-10 w-full space-x-2">
           <button
             title="Quitar productos"
