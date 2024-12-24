@@ -15,8 +15,8 @@ export const TableItemsView = ({ itemsList }) => {
         {itemsList &&
           itemsList.map((item, index) => {
             return (
-              <tr key={index} className="grid grid-cols-7 w-full">
-                <td className="col-span-2">{item.name}</td>
+              <tr key={index} className="grid grid-cols-7 w-full border-b-2">
+                <td className="col-span-2 hover:text-blue-600 hover:cursor-pointer">{item.name}</td>
                 <td>{item.boxQuantity}</td>
                 <td>{item.boxPrice}</td>
                 <td>{item.quantity}</td>
