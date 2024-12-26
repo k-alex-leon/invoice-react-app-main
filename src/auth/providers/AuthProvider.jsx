@@ -12,7 +12,7 @@ function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const onAuthStateChanged = useCallback((firebaseUser) => {
-    if (firebaseUser) setUser(firebaseUser);
+    if (firebaseUser) setUser(firebaseUser.currentUser);
     setLoading(false);
   }, []);
 
@@ -54,6 +54,7 @@ function AuthProvider({ children }) {
 
       if (res.user) {
         setUser(res.user);
+        // console.log(res.user);
         return successCallback("Inicio de sesión exitoso");
       }
 
