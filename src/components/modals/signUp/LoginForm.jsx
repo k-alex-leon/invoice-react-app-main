@@ -69,7 +69,7 @@ export function LoginForm({ onRegisterClick, closeModal }) {
         <button
           type="button"
           onClick={() => onRegisterClick()}
-          className="bg-blue-700 text-white p-2 rounded-lg w-1/2"
+          className="bg-cyan-900 text-white p-2 rounded-lg w-1/2"
         >
           Registrarme
         </button>
