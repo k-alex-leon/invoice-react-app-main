@@ -1,9 +1,17 @@
 import { useState, useRef } from "react";
 import { notify_warning } from "../../utils/Notifications";
 import uniqid from "uniqid";
+import { validateProduct } from "../../utils/Validations";
 
+const initialProduct = {
+  name: "",
+  boxQuantity: 0,
+  boxPrice: 0,
+  quantity: 0,
+  price: 0,
+}
 const ItemForm = ({ onItemChange }) => {
-  const [item, setItem] = useState({});
+  const [item, setItem] = useState(initialProduct);
 
   const productRef = useRef(null);
   const quantityRef = useRef(null);
@@ -20,31 +28,15 @@ const ItemForm = ({ onItemChange }) => {
   };
 
   const saveItem = (e) => {
-
-    if (Object.keys(item).length === 0) {
-      notify_warning("Debes ingresar un producto primero!");
-      return;
-    }
-
-    if (Object.keys(item).length < 3) {
-      notify_warning("Falta informacion del producto!");
-      return;
-    }
-
-    if (
-      (item["boxQuantity"] !== 0 && item["boxPrice"] <= 0) ||
-      (item["quantity"] === 0 && item["price"] <= 0)
-    ) {
-      notify_warning("Verifica las cantidades y/o valores del producto!");
-      return;
-    }
+    if (!validateProduct(item)) return;
 
     e.preventDefault();
     // generate a unique id
-    let id = uniqid();
-    onItemChange({...item, id});
+    // let id = uniqid();
+    // onItemChange({...item, id});
+    onItemChange(item);
     // clean all
-    setItem({});
+    setItem(initialProduct);
     productRef.current.value = "";
     quantityRef.current.value = "";
     priceRef.current.value = "";

@@ -30,7 +30,7 @@ const InvoiceSection = () => {
         date: timestamp,
         company: thisCompany,
         client: thisClient,
-        makerId: user.currentUser.uid,
+        makerId: user.uid,
       },
       (msg) => {
         notify_success(msg);

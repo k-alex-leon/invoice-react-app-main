@@ -12,7 +12,7 @@ import BaseModal from "./modals/BaseModal";
 import { notify_success } from "../utils/Notifications";
 import useData from "../hooks/useData";
 import { Timestamp } from "firebase/firestore";
-import { timestampToDate } from "../utils/Validations";
+import { numberFormat, timestampToDate } from "../utils/Validations";
 
 const InvoiceView = () => {
   // DATA STUFF
@@ -20,9 +20,10 @@ const InvoiceView = () => {
   const [thisClient, setClient] = useState({});
   const [itemsList, setItemsList] = useState([]);
   const { invoiceProducts, currentInvoiceData } = useData();
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState("");
 
   useEffect(() => {
+    if (!invoiceProducts) return;
     setItemsList(invoiceProducts);
   }, [invoiceProducts]);
 
@@ -93,7 +94,7 @@ const InvoiceView = () => {
     <div className="h-full md:border overflow-y-auto">
       <div className="flex h-full flex-col p-4 items-center justify-center">
         <div className="flex justify-end mb-10 w-full space-x-2">
-          <button
+          {/* <button
             title="Quitar productos"
             onClick={handleDeleteProducts}
             className=" p-2 bg-orange-500 text-white rounded hover:scale-110 duration-100"
@@ -107,12 +108,12 @@ const InvoiceView = () => {
             className=" p-2 bg-rose-500 text-white rounded hover:scale-110 duration-100"
           >
             <MdDelete />
-          </button>
+          </button> */}
 
           <button
             title="Imprimir"
             onClick={generatePdf}
-            className=" p-2 bg-emerald-500 text-white rounded hover:scale-110 duration-100"
+            className="absolute p-2 bg-emerald-500 text-white rounded hover:scale-110 duration-100"
           >
             <FaPrint />
           </button>
@@ -196,7 +197,7 @@ const InvoiceView = () => {
             <h3 className="w-full text-end mt-4">
               <b>Total :</b>{" "}
               <b className="rounded bg-black px-2 text-center text-white">
-                {total}
+                {numberFormat(total)}
               </b>
             </h3>
           </div>
