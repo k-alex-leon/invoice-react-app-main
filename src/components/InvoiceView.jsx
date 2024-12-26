@@ -11,43 +11,47 @@ import OptionsModal from "./modals/OptionsModal";
 import BaseModal from "./modals/BaseModal";
 import { notify_success } from "../utils/Notifications";
 import useData from "../hooks/useData";
+import { Timestamp } from "firebase/firestore";
+import { timestampToDate } from "../utils/Validations";
 
-const InvoiceView = ({ company, client, onClear, onClearList }) => {
+const InvoiceView = () => {
   // DATA STUFF
   const [thisCompany, setCompany] = useState({});
   const [thisClient, setClient] = useState({});
   const [itemsList, setItemsList] = useState([]);
-  const { invoiceProducts } = useData();
-
-  let date = new Date();
-  let hour = `${date.getHours()}:${date.getMinutes()}`;
-  let today = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  const { invoiceProducts, currentInvoiceData } = useData();
+  const [date, setDate] = useState('');
 
   useEffect(() => {
     setItemsList(invoiceProducts);
   }, [invoiceProducts]);
 
   useEffect(() => {
+    if (!currentInvoiceData) return;
+    let { company, client, date } = currentInvoiceData;
     setCompany(company);
     setClient(client);
-    // setItemsList(items);
-  }, [company, client]);
+    // can found this function in src/utils/Validations.js
+    let invoiceDate = timestampToDate(date);
+    setDate(invoiceDate);
+  }, [currentInvoiceData]);
 
   let boxRef = useRef();
 
   let total = getTotal(itemsList);
 
   // BUTTONS INVOICE ACTIONS
-
-  const clearList = (e) => {
+  const handleDeleteProducts = (e) => {
     e.preventDefault();
-    setItemsList([]);
-    onClearList();
+  };
+
+  const handleDeleteInvoice = (e) => {
+    e.preventDefault();
   };
 
   const generatePdf = useReactToPrint({
     content: () => boxRef.current,
-    documentTitle: hour + today,
+    documentTitle: date,
   });
 
   // MODALS!!!
@@ -86,12 +90,12 @@ const InvoiceView = ({ company, client, onClear, onClearList }) => {
   };
 
   return (
-    <>
+    <div className="h-full md:border overflow-y-auto">
       <div className="flex h-full flex-col p-4 items-center justify-center">
         <div className="flex justify-end mb-10 w-full space-x-2">
           <button
             title="Quitar productos"
-            onClick={clearList}
+            onClick={handleDeleteProducts}
             className=" p-2 bg-orange-500 text-white rounded hover:scale-110 duration-100"
           >
             <AiOutlineClear />
@@ -99,7 +103,7 @@ const InvoiceView = ({ company, client, onClear, onClearList }) => {
 
           <button
             title="Eliminar"
-            onClick={onClear}
+            onClick={handleDeleteInvoice}
             className=" p-2 bg-rose-500 text-white rounded hover:scale-110 duration-100"
           >
             <MdDelete />
@@ -117,7 +121,7 @@ const InvoiceView = ({ company, client, onClear, onClearList }) => {
         <div className="w-full h-full">
           <div
             ref={boxRef}
-            className="w-full h-full border p-4 rounded bg-white z-40"
+            className="w-full h-auto min-h-full border p-4 rounded bg-white z-40"
           >
             <div>
               <h1 className="text-center font-bold">
@@ -136,7 +140,7 @@ const InvoiceView = ({ company, client, onClear, onClearList }) => {
                   <tr>
                     <td>Fecha</td>
                     <td className="text-end font-bold flex flex-col justify-end">
-                      {`${hour}-${today}`}
+                      {`${date}`}
                     </td>
                   </tr>
 
@@ -213,7 +217,7 @@ const InvoiceView = ({ company, client, onClear, onClearList }) => {
         onDataChange={handleDataToInvoice}
         onClose={handleModalBaseVisible}
       />
-    </>
+    </div>
   );
 };
 

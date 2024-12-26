@@ -1,11 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { notify_warning } from "../../utils/Notifications";
 
-const ClientForm = ({ onClientChange, hide }) => {
+const ClientForm = ({ onClientChange }) => {
   const [client, setClient] = useState({});
-
-  useEffect(() => {
-    onClientChange(client);
-  }, [client]);
 
   const handleValueChange = (e) => {
     const { name, value } = e.target;
@@ -15,9 +12,14 @@ const ClientForm = ({ onClientChange, hide }) => {
     }));
   };
 
+  useEffect(() => {
+    onClientChange(client);
+  }, [client]);
+
   return (
-    <form className={`${!hide ? "h-0" : "h-auto"} p-2`}>
-      <div className={`${!hide ? "hidden" : "block"} pb-2 px-2`}>
+    <form>
+      <div className="pb-2 px-2">
+        <h4 className="my-2 font-bold w-full border-b-2">Comprador</h4>
         <div className="md:flex space-y-1 mt-1 sm:space-y-0 sm:space-x-2">
           <input
             className="border w-full rounded-lg border-slate-200 hover:border-slate-500 p-2"

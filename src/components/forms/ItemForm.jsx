@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { notify_warning } from "../../utils/Notifications";
+import uniqid from "uniqid";
 
 const ItemForm = ({ onItemChange }) => {
   const [item, setItem] = useState({});
@@ -19,7 +20,6 @@ const ItemForm = ({ onItemChange }) => {
   };
 
   const saveItem = (e) => {
-    console.log("item: " + JSON.stringify(item));
 
     if (Object.keys(item).length === 0) {
       notify_warning("Debes ingresar un producto primero!");
@@ -40,7 +40,9 @@ const ItemForm = ({ onItemChange }) => {
     }
 
     e.preventDefault();
-    onItemChange(item);
+    // generate a unique id
+    let id = uniqid();
+    onItemChange({...item, id});
     // clean all
     setItem({});
     productRef.current.value = "";

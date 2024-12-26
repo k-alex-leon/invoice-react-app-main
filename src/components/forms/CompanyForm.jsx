@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { notify_warning } from "../../utils/Notifications";
 
-const CompanyForm = ({ onCompanyChange, hide }) => {
+const CompanyForm = ({ onCompanyChange }) => {
   const [company, setCompany] = useState({});
 
   useEffect(() => {
     onCompanyChange(company);
-  }, [company]);
+  } , [company]);
 
   const handleValueChange = (e) => {
     const { name, value } = e.target;
@@ -16,8 +17,9 @@ const CompanyForm = ({ onCompanyChange, hide }) => {
   };
 
   return (
-    <form className={`${!hide ? "h-0" : "h-auto"} p-2`}>
-      <div className={`${!hide ? "hidden" : "block"} pb-2 px-2`}>
+    <form>
+      <div className="pb-2 px-2">
+        <h4 className="my-2 font-bold w-full border-b-2">Empresa</h4>
         <div className="sm:flex space-y-1 sm:space-x-2 sm:space-y-0 mt-1">
           <input
             className="border w-full rounded-lg border-slate-200 hover:border-slate-500 p-2"

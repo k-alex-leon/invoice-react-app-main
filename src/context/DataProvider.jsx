@@ -5,8 +5,8 @@ import {
   getDocs,
   onSnapshot,
   query,
-  setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { createContext, useEffect, useState } from "react";
 import { db } from "../../firebase.config";
@@ -15,28 +15,31 @@ let DataContext = createContext(null);
 
 function DataProvider({ children }) {
   const [currentInvoice, setCurrentInvoice] = useState(null);
+  const [currentInvoiceData, setCurrentInvoiceData] = useState(null);
   const invoiceCollection = collection(db, "invoices");
   const [invoiceProducts, setInvoiceProducts] = useState([]);
 
   const createInvoice = async (
-    { company, client, makerId },
+    { company, client, makerId, date },
     onSuccess,
     onError
   ) => {
-    let invoice = {
+    // let invoice
+    let invoiceData = {
       makerId: makerId,
-      company: company,
-      client: client,
-      list: {},
+      date,
+      company,
+      client,
     };
 
     try {
       // let invoiceRef = doc(invoiceCollection);
-      let res = await addDoc(invoiceCollection, invoice);
+      let res = await addDoc(invoiceCollection, invoiceData);
 
       if (res) {
         setCurrentInvoice(res);
-        console.log("Invoice created: " + JSON.stringify(res));
+        setCurrentInvoiceData(invoiceData);
+
         return onSuccess("Factura creada correctamente");
       }
 
@@ -64,23 +67,8 @@ function DataProvider({ children }) {
     }
   };
 
+  // subscribe to the products sub-collection
   const getInvoiceProducts = async () => {
-    // if (!currentInvoice) return console.error("No hay factura seleccionada");
-    // try {
-    //   let itemRef = doc(db, "invoices", currentInvoice.id);
-    //   const productsCollection = collection(itemRef, "products");
-    //   const q = query(productsCollection);
-    //   let res = await getDocs(q);
-
-    //   if (res) {
-    //     // return onSuccess(res.data());
-    //     const products = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    //     return setInvoiceProducts(products);
-    //   }
-    // } catch (error) {
-    //   console.error("Error obteniendo los productos: " + error);
-    // }
-
     const itemRef = doc(db, "invoices", currentInvoice.id);
     const productsCollection = collection(itemRef, "products");
     const q = query(productsCollection);
@@ -102,11 +90,34 @@ function DataProvider({ children }) {
     return unsubscribe;
   };
 
+  // listen for changes in the current invoice
   useEffect(() => {
-    if(!currentInvoice) return;
+    if (!currentInvoice) return;
     const unsubscribe = getInvoiceProducts();
     return () => unsubscribe();
   }, [currentInvoice]);
+
+  const getInvoicesByUser = async (userId, onSuccess, onError) => {
+    if (!userId)
+      return onError("No hay usuario seleccionado para obtener facturas");
+
+    try {
+      // Create a query with a filter
+      const q = query(invoiceCollection, where("makerId", "==", userId));
+
+      const querySnapshot = await getDocs(q);
+      const invoices = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      return onSuccess(invoices);
+      
+    } catch (error) {
+      console.error("Error getting invoices:", error);
+      return [];
+    }
+  };
 
   const deleteAllProducts = async (onSuccess, onError) => {
     if (!currentInvoice) return onError("No hay factura seleccionada");
@@ -126,8 +137,10 @@ function DataProvider({ children }) {
     <DataContext.Provider
       value={{
         invoiceProducts,
+        currentInvoiceData,
         createInvoice,
         addProduct,
+        getInvoicesByUser,
         deleteAllProducts,
       }}
     >
