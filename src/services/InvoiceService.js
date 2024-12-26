@@ -1,4 +1,5 @@
 export const getTotal = (items) => {
+  if (!items) return 0;
   let total = 0;
 
   items.forEach((item) => {
