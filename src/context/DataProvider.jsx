@@ -1,9 +1,11 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
+  orderBy,
   query,
   updateDoc,
   where,
@@ -14,7 +16,7 @@ import { db } from "../../firebase.config";
 let DataContext = createContext(null);
 
 function DataProvider({ children }) {
-  const [currentInvoice, setCurrentInvoice] = useState(null);
+  const [currentInvoiceId, setCurrentInvoiceId] = useState(null);
   const [currentInvoiceData, setCurrentInvoiceData] = useState(null);
   const invoiceCollection = collection(db, "invoices");
   const [invoiceProducts, setInvoiceProducts] = useState([]);
@@ -37,7 +39,8 @@ function DataProvider({ children }) {
       let res = await addDoc(invoiceCollection, invoiceData);
 
       if (res) {
-        setCurrentInvoice(res);
+        console.log("Factura ref: ", res);
+        setCurrentInvoiceId(res.id);
         setCurrentInvoiceData(invoiceData);
 
         return onSuccess("Factura creada correctamente");
@@ -50,16 +53,16 @@ function DataProvider({ children }) {
   };
 
   const addProduct = async (product, onSuccess, onError) => {
-    if (!currentInvoice) return onError("No hay factura seleccionada");
+    if (!currentInvoiceId) return onError("No hay factura seleccionada");
 
     try {
+      const invoiceRef = doc(db, "invoices", currentInvoiceId);
       // const productsCollection = collection(invoiceCollection, "products");
-      let productCollectionRef = collection(currentInvoice, "products");
+      let productCollectionRef = collection(invoiceRef, "products");
       // let productRef = doc(productCollectionRef);
       let res = await addDoc(productCollectionRef, product);
 
       if (res) {
-        // getInvoiceProducts();
         return onSuccess("Producto agregado correctamente");
       }
     } catch (error) {
@@ -68,8 +71,8 @@ function DataProvider({ children }) {
   };
 
   // subscribe to the products sub-collection
-  const getInvoiceProducts = async () => {
-    const itemRef = doc(db, "invoices", currentInvoice.id);
+  const getInvoiceProducts = () => {
+    const itemRef = doc(invoiceCollection, currentInvoiceId);
     const productsCollection = collection(itemRef, "products");
     const q = query(productsCollection);
 
@@ -92,10 +95,10 @@ function DataProvider({ children }) {
 
   // listen for changes in the current invoice
   useEffect(() => {
-    if (!currentInvoice) return;
+    if (!currentInvoiceId) return;
     const unsubscribe = getInvoiceProducts();
     return () => unsubscribe();
-  }, [currentInvoice]);
+  }, [currentInvoiceId]);
 
   const getInvoicesByUser = async (userId, onSuccess, onError) => {
     if (!userId)
@@ -103,7 +106,7 @@ function DataProvider({ children }) {
 
     try {
       // Create a query with a filter
-      const q = query(invoiceCollection, where("makerId", "==", userId));
+      const q = query(invoiceCollection, where("makerId", "==", userId), orderBy("date"));
 
       const querySnapshot = await getDocs(q);
       const invoices = querySnapshot.docs.map((doc) => ({
@@ -112,24 +115,28 @@ function DataProvider({ children }) {
       }));
 
       return onSuccess(invoices);
-      
     } catch (error) {
       console.error("Error getting invoices:", error);
       return [];
     }
   };
 
-  const deleteAllProducts = async (onSuccess, onError) => {
-    if (!currentInvoice) return onError("No hay factura seleccionada");
+  const deleteProductSelected = async (productId, onSuccess, onError) => {
+    if (!currentInvoiceId) return onError("No hay factura seleccionada");
     try {
-      let itemRef = doc(db, "invoices", currentInvoice);
-      let res = await updateDoc(itemRef, { list: {} });
+      const productRef = doc(
+        invoiceCollection,
+        currentInvoiceId,
+        "products",
+        productId
+      );
 
-      if (res) {
-        return onSuccess("Productos eliminados correctamente");
-      }
+      const res = await deleteDoc(productRef);
+
+      if (res) return onError("Error eliminando producto");
+      return onSuccess("Producto eliminado correctamente");
     } catch (error) {
-      onError("Error eliminando los productos: " + error);
+      onError("Error eliminando producto: " + error);
     }
   };
 
@@ -141,7 +148,9 @@ function DataProvider({ children }) {
         createInvoice,
         addProduct,
         getInvoicesByUser,
-        deleteAllProducts,
+        deleteProductSelected,
+        setCurrentInvoiceData,
+        setCurrentInvoiceId,
       }}
     >
       {children}
